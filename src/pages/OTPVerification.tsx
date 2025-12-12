@@ -62,25 +62,58 @@ const OTPVerification: React.FC = () => {
   const handleVerify = async (code: string) => {
     setIsLoading(true);
     setError('');
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp: code }),
+      });
 
-    // Simulate API verification
-    await new Promise(resolve => setTimeout(resolve, 2000));
+      const data = await res.json();
 
-    // Simulate successful verification (in production, validate against server)
-    if (code === '123456' || code.length === 6) {
-      navigate('/success', { state: { email } });
-    } else {
-      setError('Invalid verification code. Please try again.');
+      if (!res.ok) {
+        setError(data.error?.message || 'Failed to verify OTP');
+        setOtp(Array(6).fill(''));
+        setIsLoading(false);
+        return;
+      }
+
+      // Store session ID and navigate
+      localStorage.setItem('sessionId', data.data.sessionId);
+      localStorage.setItem('userEmail', email);
+      navigate('/session-created', { state: { email, sessionId: data.data.sessionId } });
+    } catch (err) {
+      console.error(err);
+      setError('An error occurred. Please try again.');
       setIsLoading(false);
     }
   };
 
   const handleResend = async () => {
     setIsResending(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsResending(false);
-    setOtp(Array(6).fill(''));
-    inputRefs.current[0]?.focus();
+    setError('');
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/resend-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error?.message || 'Failed to resend OTP');
+        setIsResending(false);
+        return;
+      }
+
+      setOtp(Array(6).fill(''));
+      inputRefs.current[0]?.focus();
+    } catch (err) {
+      console.error(err);
+      setError('An error occurred. Please try again.');
+    } finally {
+      setIsResending(false);
+    }
   };
 
   return (

@@ -33,11 +33,28 @@ const EmailEntry: React.FC = () => {
 
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
 
-    setIsLoading(false);
-    navigate('/verify', { state: { email } });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error?.message || 'Failed to send OTP');
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(false);
+      navigate('/verify', { state: { email, expiresIn: data.data?.expiresIn } });
+    } catch (err) {
+      console.error(err);
+      setError('An error occurred. Please try again.');
+      setIsLoading(false);
+    }
   };
 
   return (
