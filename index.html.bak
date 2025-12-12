@@ -1,11 +1,15 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SecureAuth - Email Verification</title>
     <meta name="description" content="Secure OTP-based email verification system" />
-    <meta name="author" content="SecureAuth" />
+    <meta name="author" content="Lovable" />
+    <meta property="og:title" content="SecureAuth - Email Verification" />
+    <meta property="og:description" content="Secure OTP-based email verification system" />
+    <meta property="og:type" content="website" />
+    <link rel="canonical" href="/" />
   </head>
   <body>
     <div id="root"></div>
